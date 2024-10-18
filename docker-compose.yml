@@ -1,0 +1,28 @@
+version: "3"
+services:
+  server:
+    container_name: server
+    build: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/data/certs:/etc/nginx/certs
+    depends_on:
+        - node-app
+  db:
+    container_name: db
+    image: mongo
+    environment:
+      - PORT=27017
+    volumes:
+    - /data-vol:/data/db
+  node-app:
+    container_name: api
+    restart: always
+    build: ./api
+    environment:
+      - PORT=8001
+    links:
+      - db
